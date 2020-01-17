@@ -21,6 +21,8 @@ def inverse(a, n):
     else:
         return a_inv % n
 
+#TODO give a seed to random gen
+
 def round(i,keys):
     print "---------- ROUND " + str(i)
     a = keys['privateKey'].x
