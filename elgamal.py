@@ -361,6 +361,7 @@ def decrypt(key, cipher):
 
 def test():
 	keys = generate_keys()
-        print keys['privateKey']
-        print keys['publicKey']
+        print keys['privateKey'].p
+        print keys['privateKey'].x 
+        print keys['publicKey'].h
 test();
