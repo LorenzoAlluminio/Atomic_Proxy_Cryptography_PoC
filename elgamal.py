@@ -298,7 +298,7 @@ def generate_keys(iNumBits=256, iConfidence=32):
 		while True:
  			x = random.randint(1, (p - 1))
   			if gcd(x, p-1)==1:
-    			break
+    			    break
 
 		h = modexp( g, x, p )
 		publicKey = PublicKey(p, g, h, iNumBits)
