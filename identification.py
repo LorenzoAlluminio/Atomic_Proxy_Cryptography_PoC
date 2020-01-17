@@ -21,6 +21,8 @@ def inverse(a, n):
     else:
         return a_inv % n
 
+#TODO give a seed to random gen
+
 def round(i,keys):
     print "---------- ROUND " + str(i)
     a = keys['privateKey'].x
@@ -50,9 +52,29 @@ def round(i,keys):
     print "res --> " + str(res)
     if res == s1:
         print "Alice identificathed"
+        return [b,s1,s2]
     else:
         print "ERROR"
 
+def generate_proxy_key(a,b,p):
+    invb = inverse(b, p-1)
+    return (a*invb)
+
+# TODO increase number of bits
 keys=generate_keys(32,32)
+
+c = []
 for i in range(1,5):
-    round(i,keys)
+    c.append(round(i,keys))
+
+keys2=generate_keys(32,32)
+proxy_key = generate_proxy_key(keys['privateKey'].x, keys2['privateKey'].x, keys2['privateKey'].p)
+
+for i in range(1,5):
+    if(c[i][0]==1)
+        s2 = s2 * proxy_key
+
+print "CONVERT CIPHERS"
+
+for i in range(1,5):
+    round_with_cipher(i,keys2,c)
