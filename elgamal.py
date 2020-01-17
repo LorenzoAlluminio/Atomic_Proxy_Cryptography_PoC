@@ -295,9 +295,12 @@ def generate_keys(iNumBits=256, iConfidence=32):
 		p = find_prime(iNumBits, iConfidence)
 		g = find_primitive_root(p)
 		g = modexp( g, 2, p )
-		x = random.randint( 1, (p - 1) // 2 )
-		h = modexp( g, x, p )
+		while True:
+ 			x = random.randint(1, (p - 1))
+  			if gcd(x, p-1)==1:
+    			break
 
+		h = modexp( g, x, p )
 		publicKey = PublicKey(p, g, h, iNumBits)
 		privateKey = PrivateKey(p, g, x, iNumBits)
 
@@ -324,7 +327,7 @@ def encrypt(key, sPlaintext):
 		encryptedStr = ""
 		for pair in cipher_pairs:
 				encryptedStr += str(pair[0]) + ' ' + str(pair[1]) + ' '
-	
+
 		return encryptedStr
 
 #performs decryption on the cipher pairs found in Cipher using
@@ -366,5 +369,3 @@ def test():
 		plain = decrypt(priv, cipher)
 
 		return message == plain
-
-
