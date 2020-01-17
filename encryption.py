@@ -70,6 +70,12 @@ def SS( num, iConfidence ):
 		#if there have been t iterations without failure, num is believed to be prime
 		return True
 
+class ProxyKey(object):                                                                                                                                                                     
+        def __init__(self, p=None, g=None, piab=None, iNumBits=0):                                                                                                                               
+                self.p = p                                                                                                                                                                    
+                self.g = g                                                                                                                                                                    
+                self.piab = piab
+                self.iNumBits = iNumBits                                                                                                                                                      
 class PrivateKey(object):                                                                                                                                                                     
         def __init__(self, p=None, g=None, a=None,a_inv=None, iNumBits=0):                                                                                                                               
                 self.p = p                                                                                                                                                                    
@@ -139,19 +145,22 @@ def modinv(a, m):
         return x % m
     return pow(base, exp, modulus)
 
-def generate_keys(iNumBits=256, iConfidence=32):                                      
+
+def generate_keys(iNumBits=256, iConfidence=32,p = None):                                      
                 #p is the prime                     
                 #g is the primitve root             
                 #x is random in (0, p-1) inclusive                                                 
-                #h = g ^a mod p
-                p = find_prime(iNumBits, iConfidence)                              
+                #h = g ^a mod p 
+                if(p == None):
+                    p = find_prime(iNumBits, iConfidence)                              
                 g = find_primitive_root(p)                      
                 g = modexp( g, 2, p )                                                                 
                 while True:                                         
-                       a = random.randint(1, (p - 1))
-                       #instead of calculating the gcd we could check if a%2 == 0 && a%q == 0                                                              
-                       if gcd(a, p-1)==1:
-                               break
+                   a = random.randint(1, (p - 1))
+                   #instead of calculating the gcd we could check if a%2 == 0 && a%q == 0                                                              
+                   if gcd(a, p-1)==1:
+                       break
+                
                 a_inv = modinv(a,p-1)
                 h = modexp( g, a, p )
                 publicKey = PublicKey(p, g, h, iNumBits)
@@ -271,10 +280,29 @@ def decode(aiPlaintext, iNumBits):
 		decodedText = bytearray(b for b in bytes_array).decode('utf-8')
 
 		return decodedText
+def calculateProxyKey(keyA,keyB):
+    keyPiAB = ProxyKey(keyA.p,keyA.g,keyB.a * keyA.a_inv)  
+    return keyPiAB
+def encryptionProxy(cipher_pairs,keyPiAB):
+    newcipher_pairs = []
+    for i in cipher_pairs:
+        c1 = i[0]
+        c2 = i[1]
+        c2 = modexp( c2, keyPiAB.piab, keyPiAB.p )
+        newcipher_pairs.append( [c1, c2] )
+    		
+        #add plain to list of plaintext integers
+    return newcipher_pairs 
 
-keys = generate_keys(32) 
-enc = encryption(keys['publicKey'],"ciaadsasdfijhiasodufadgshuygfadsygfdsgfyudsagfyusadgfads")
+keysAlice = generate_keys(32) 
+keysBob  = generate_keys(32,p=keysAlice['publicKey'].p) 
+enc = encryption(keysAlice['publicKey'],"cia")
+keysPiAB = calculateProxyKey(keysAlice['privateKey'],keysBob['privateKey'])
+print keysPiAB.piab
+enc = encryptionProxy(enc,keysPiAB)
 print enc
-print decryption(keys['privateKey'],enc)
+print decryption(keysBob['privateKey'],enc)
+
+
 
 
