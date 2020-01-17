@@ -52,7 +52,9 @@ def round(i,keys):
         print "Alice identificathed"
     else:
         print "ERROR"
+    #TODO implement proxy key
 
+# TODO increase number of bits
 keys=generate_keys(32,32)
 for i in range(1,5):
     round(i,keys)
