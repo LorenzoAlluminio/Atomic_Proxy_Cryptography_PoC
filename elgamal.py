@@ -82,19 +82,46 @@ import math
 import sys
 
 class PrivateKey(object):
-	def __init__(self, p=None, g=None, x=None, iNumBits=0):
+	def __init__(self, p=None, g=None, x=None, x_inv=None,iNumBits=0):
 		self.p = p
 		self.g = g
 		self.x = x
 		self.iNumBits = iNumBits
+                self.x_inv = x_inv
 
 class PublicKey(object):
 	def __init__(self, p=None, g=None, h=None, iNumBits=0):
 		self.p = p
 		self.g = g
 		self.h = h
-		self.iNumBits = iNumBits
+                self.iNumBits = iNumBits
 
+class ProxyKey(object):                                                                                                                                                                     
+        def __init__(self, p=None, g=None, piab=None, iNumBits=0):                                                                                                                               
+                self.p = p                                                                                                                                                                    
+                self.g = g                                                                                                                                                                    
+                self.piab = piab
+                self.iNumBits = iNumBits                                                                                                                                                      
+
+
+def egcd(a, b):
+    """Extended gcd of a and b. Returns (d, x, y) such that
+    d = a*x + b*y where d is the greatest common divisor of a and b."""
+    x0, x1, y0, y1 = 1, 0, 0, 1
+    while b != 0:
+        q, a, b = a // b, b, a % b
+        x0, x1 = x1, x0 - q * x1
+        y0, y1 = y1, y0 - q * y1
+    return a, x0, y0
+
+def inverse(a, n):
+    """Returns the inverse x of a mod n, i.e. x*a = 1 mod n. Raises a
+    ZeroDivisionError if gcd(a,n) != 1."""
+    d, a_inv, n_inv = egcd(a, n)
+    if d != 1:
+        raise ZeroDivisionError('{} is not coprime to {}'.format(a, n))
+    else:
+        return a_inv % n
 # computes the greatest common denominator of a and b.  assumes a > b
 def gcd( a, b ):
 		while b != 0:
@@ -104,9 +131,18 @@ def gcd( a, b ):
 		#a is returned if b == 0
 		return a
 
+
 #computes base^exp mod modulus
 def modexp( base, exp, modulus ):
 		return pow(base, exp, modulus)
+
+def modinv(a, m):
+    g, x, y = egcd(a, m)
+    if g != 1:
+        raise Exception('modular inverse does not exist')
+    else:
+        return x % m
+    return pow(base, exp, modulus)
 
 #solovay-strassen primality test.  tests if num is prime
 def SS( num, iConfidence ):
@@ -287,12 +323,14 @@ def decode(aiPlaintext, iNumBits):
 		return decodedText
 
 #generates public key K1 (p, g, h) and private key K2 (p, g, x)
-def generate_keys(iNumBits=256, iConfidence=32):
+def generate_keys(iNumBits=256, iConfidence=32,p =None):
 		#p is the prime
 		#g is the primitve root
 		#x is random in (0, p-1) inclusive
 		#h = g ^ x mod p
-		p = find_prime(iNumBits, iConfidence)
+                if(p==None):
+		    p = find_prime(iNumBits, iConfidence)
+
 		g = find_primitive_root(p)
 		g = modexp( g, 2, p )
 		while True:
@@ -301,8 +339,9 @@ def generate_keys(iNumBits=256, iConfidence=32):
                                break
 
 		h = modexp( g, x, p )
-		publicKey = PublicKey(p, g, h, iNumBits)
-		privateKey = PrivateKey(p, g, x, iNumBits)
+                x_inv = modinv(x,p-1)
+		publicKey = PublicKey(p, g, h,iNumBits)
+		privateKey = PrivateKey(p, g, x,  x_inv,iNumBits)
 
 		return {'privateKey': privateKey, 'publicKey': publicKey}
 

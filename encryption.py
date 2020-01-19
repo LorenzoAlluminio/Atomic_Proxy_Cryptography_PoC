@@ -4,169 +4,8 @@ import random
 import math
 import sys
 
+from elgamal import *
 
-
-#computes the jacobi symbol of a, n
-def jacobi( a, n ):
-		if a == 0:
-				if n == 1:
-						return 1
-				else:
-						return 0
-		#property 1 of the jacobi symbol
-		elif a == -1:
-				if n % 2 == 0:
-						return 1
-				else:
-						return -1
-		#if a == 1, jacobi symbol is equal to 1
-		elif a == 1:
-				return 1
-		#property 4 of the jacobi symbol
-		elif a == 2:
-				if n % 8 == 1 or n % 8 == 7:
-						return 1
-				elif n % 8 == 3 or n % 8 == 5:
-						return -1
-		#property of the jacobi symbol:
-		#if a = b mod n, jacobi(a, n) = jacobi( b, n )
-		elif a >= n:
-				return jacobi( a%n, n)
-		elif a%2 == 0:
-				return jacobi(2, n)*jacobi(a//2, n)
-		#law of quadratic reciprocity
-		#if a is odd and a is coprime to n
-		else:
-				if a % 4 == 3 and n%4 == 3:
-						return -1 * jacobi( n, a)
-				else:
-						return jacobi(n, a )
-
-
-
-#solovay-strassen primality test.  tests if num is prime
-def gcd( a, b ):
-		while b != 0:
-			c = a % b
-			a = b
-			b = c
-		#a is returned if b == 0
-		return a
-
-def SS( num, iConfidence ):
-		#ensure confidence of t
-		for i in range(iConfidence):
-				#choose random a between 1 and n-2
-				a = random.randint( 1, num-1 )
-
-				#if a is not relatively prime to n, n is composite
-				if gcd( a, num ) > 1:
-						return False
-
-				#declares n prime if jacobi(a, n) is congruent to a^((n-1)/2) mod n
-				if not jacobi( a, num ) % num == modexp ( a, (num-1)//2, num ):
-						return False
-
-		#if there have been t iterations without failure, num is believed to be prime
-		return True
-
-class ProxyKey(object):                                                                                                                                                                     
-        def __init__(self, p=None, g=None, piab=None, iNumBits=0):                                                                                                                               
-                self.p = p                                                                                                                                                                    
-                self.g = g                                                                                                                                                                    
-                self.piab = piab
-                self.iNumBits = iNumBits                                                                                                                                                      
-class PrivateKey(object):                                                                                                                                                                     
-        def __init__(self, p=None, g=None, a=None,a_inv=None, iNumBits=0):                                                                                                                               
-                self.p = p                                                                                                                                                                    
-                self.g = g                                                                                                                                                                    
-                self.a = a  
-                self.a_inv  = a_inv
-                self.iNumBits = iNumBits                                                                                                                                                      
-                                                                                                                                                                                              
-class PublicKey(object):                                                                                                                                                                      
-        def __init__(self, p=None, g=None, ga=None, iNumBits=0):                                                                                                                               
-                self.p = p                                                                                                                                                                    
-                self.g = g                                                                                                                                                                    
-                self.ga =ga                                                                                                                                                                    
-                self.iNumBits = iNumBits  
-
-def find_primitive_root( p ):
-		if p == 2:
-				return 1
-		#the prime divisors of p-1 are 2 and (p-1)/2 because
-		#p = 2x + 1 where x is a prime
-		p1 = 2
-		p2 = (p-1) // p1
-
-		#test random g's until one is found that is a primitive root mod p
-		while( 1 ):
-				g = random.randint( 2, p-1 )
-				#g is a primitive root if for all prime factors of p-1, p[i]
-				#g^((p-1)/p[i]) (mod p) is not congruent to 1
-				if not (modexp( g, (p-1)//p1, p ) == 1):
-						if not modexp( g, (p-1)//p2, p ) == 1:
-								return g
-def modexp( base, exp, modulus ):
-            return pow(base, exp, modulus)
-#find n bit prime
-def find_prime(iNumBits, iConfidence):
-		#keep testing until one is found
-		while(1):
-				#generate potential prime randomly
-				p = random.randint( 2**(iNumBits-2), 2**(iNumBits-1) )
-				#make sure it is odd
-				while( p % 2 == 0 ):
-						p = random.randint(2**(iNumBits-2),2**(iNumBits-1))
-
-				#keep doing this if the solovay-strassen test fails
-				while( not SS(p, iConfidence) ):
-						p = random.randint( 2**(iNumBits-2), 2**(iNumBits-1) )
-						while( p % 2 == 0 ):
-								p = random.randint(2**(iNumBits-2), 2**(iNumBits-1))
-
-				#if p is prime compute p = 2*p + 1
-				#if p is prime, we have succeeded; else, start over
-				p = p * 2 + 1
-				if SS(p, iConfidence):
-						return p
-def egcd(a, b):
-        if a == 0:
-            return (b, 0, 1)
-        else:
-            g, y, x = egcd(b % a, a)
-            return (g, x - (b // a) * y, y)
-
-def modinv(a, m):
-    g, x, y = egcd(a, m)
-    if g != 1:
-        raise Exception('modular inverse does not exist')
-    else:
-        return x % m
-    return pow(base, exp, modulus)
-
-
-def generate_keys(iNumBits=256, iConfidence=32,p = None):                                      
-                #p is the prime                     
-                #g is the primitve root             
-                #x is random in (0, p-1) inclusive                                                 
-                #h = g ^a mod p 
-                if(p == None):
-                    p = find_prime(iNumBits, iConfidence)                              
-                g = find_primitive_root(p)                      
-                g = modexp( g, 2, p )                                                                 
-                while True:                                         
-                   a = random.randint(1, (p - 1))
-                   #instead of calculating the gcd we could check if a%2 == 0 && a%q == 0                                                              
-                   if gcd(a, p-1)==1:
-                       break
-                
-                a_inv = modinv(a,p-1)
-                h = modexp( g, a, p )
-                publicKey = PublicKey(p, g, h, iNumBits)
-                privateKey = PrivateKey(p, g,a , a_inv, iNumBits)
-
-                return {'privateKey': privateKey, 'publicKey': publicKey}
 
 def encode(sPlaintext, iNumBits):
 		byte_array = bytearray(sPlaintext,'utf-16')
@@ -217,7 +56,7 @@ def encryption(publicKey, plainText):
         gk = modexp( publicKey.g, k, publicKey.p )
         c1 = (i*gk )% publicKey.p
         #d = ih^y mod p
-        c2 = modexp( publicKey.ga, k, publicKey.p )
+        c2 = modexp( publicKey.h, k, publicKey.p )
         #add the pair to the cipher pairs list
         cipher_pairs.append( [c1, c2] )
     return cipher_pairs
@@ -227,7 +66,7 @@ def decryption(privateKey, cipher_pairs ):
     for i in cipher_pairs:
         c1 = i[0]
         c2 = i[1]
-        s = modexp( c2, privateKey.a_inv, privateKey.p )
+        s = modexp( c2, privateKey.x_inv, privateKey.p )
     		
         plain = (c1*modinv( s,  privateKey.p)) % privateKey.p
         #add plain to list of plaintext integers
@@ -281,7 +120,7 @@ def decode(aiPlaintext, iNumBits):
 
 		return decodedText
 def calculateProxyKey(keyA,keyB):
-    keyPiAB = ProxyKey(keyA.p,keyA.g,keyB.a * keyA.a_inv)  
+    keyPiAB = ProxyKey(keyA.p,keyA.g,keyB.x * keyA.x_inv)  
     return keyPiAB
 def encryptionProxy(cipher_pairs,keyPiAB):
     newcipher_pairs = []
@@ -296,7 +135,7 @@ def encryptionProxy(cipher_pairs,keyPiAB):
 
 keysAlice = generate_keys(32) 
 keysBob  = generate_keys(32,p=keysAlice['publicKey'].p) 
-enc = encryption(keysAlice['publicKey'],"cia")
+enc = encryption(keysAlice['publicKey'],"ciaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadasdasdsadasdas")
 keysPiAB = calculateProxyKey(keysAlice['privateKey'],keysBob['privateKey'])
 print keysPiAB.piab
 enc = encryptionProxy(enc,keysPiAB)
