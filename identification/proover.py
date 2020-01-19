@@ -1,12 +1,12 @@
 from pwn import *
 import sys
 
-a=sys.argv[1]
-p=sys.argv[2]
+a=int(sys.argv[1])
+p=int(sys.argv[2])
 qq=p-1
-g=sys.argv[3]
-port=sys.argv[4]
-nRound=sys.argv[5]
+g=int(sys.argv[3])
+port=int(sys.argv[4])
+nRound=int(sys.argv[5])
 
 io = remote('localhost', port)
 
