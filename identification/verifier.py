@@ -67,31 +67,43 @@ from pwn import *
 p = int(sys.argv[2])
 g = int(sys.argv[3])
 ga = int(sys.argv[1])
-nRound = int(sys.argv[5])
+print ga
 port = int(sys.argv[4])
+print port
+nRound = int(sys.argv[5])
 
 if(len(sys.argv) > 6):
     gb = int(sys.argv[7])     
     proxyKey = int(sys.argv[6])
 l = listen(int(port))
 for i in range(1,nRound):
-    s1str = p.recvline()
+    s1str = l.recvline()
     s1 = int(s1str)
     print s1str
     b = random.randint( 0, 1 )
     print b
-    p.sendline(str(b))
-    s2str = p.recvline()
+    l.sendline(str(b))
+    s2str = l.recvline()
     s2 = int(s2str)
-    if(proxyKey):
-        s2 = s2*proxyKey    
-    if(b == 1):
-        res = modexp(ga, s2, p)
-    else:
-        res = modexp(g, s2, p)
-    
+    if(len(sys.argv) > 6):
+        if(b == 1):
+           s2 = s2*proxyKey    
+           res = modexp(gb, s2, p)            
+        else:
+           res = modexp(g, s2, p)                
+    else:   
+        if(b == 1):
+            res = modexp(ga, s2, p)
+        else:
+            res = modexp(g, s2, p)
+    print res
+    print s1
+    print s2
     if res == s1:
-        print "Alice identificathed"
+        if(len(sys.argv) > 6):
+            print "Bob identificathed"
+        else:        
+            print "Alice identificathed"
     else:
         print "ERROR"
 
