@@ -2,6 +2,8 @@ from random import *
 from elgamal import *
 from math import *
 
+
+
 def egcd(a, b):
     """Extended gcd of a and b. Returns (d, x, y) such that
     d = a*x + b*y where d is the greatest common divisor of a and b."""
@@ -60,21 +62,36 @@ def generate_proxy_key(a,b,p):
     invb = inverse(b, p-1)
     return (a*invb)
 
-# TODO increase number of bits
-keys=generate_keys(32,32)
+import sys
+from pwn import *
+p = int(sys.argv[2])
+g = int(sys.argv[3])
+ga = int(sys.argv[1])
+nRound = int(sys.argv[5])
+port = int(sys.argv[4])
 
-c = []
-for i in range(1,5):
-    c.append(round(i,keys))
+if(len(sys.argv) > 6):
+    gb = int(sys.argv[7])     
+    proxyKey = int(sys.argv[6])
+l = listen(int(port))
+for i in range(1,nRound):
+    s1str = p.recvline()
+    s1 = int(s1str)
+    print s1str
+    b = random.randint( 0, 1 )
+    print b
+    p.sendline(str(b))
+    s2str = p.recvline()
+    s2 = int(s2str)
+    if(proxyKey):
+        s2 = s2*proxyKey    
+    if(b == 1):
+        res = modexp(ga, s2, p)
+    else:
+        res = modexp(g, s2, p)
+    
+    if res == s1:
+        print "Alice identificathed"
+    else:
+        print "ERROR"
 
-keys2=generate_keys(32,32)
-proxy_key = generate_proxy_key(keys['privateKey'].x, keys2['privateKey'].x, keys2['privateKey'].p)
-
-for i in range(1,5):
-    if(c[i][0]==1)
-        s2 = s2 * proxy_key
-
-print "CONVERT CIPHERS"
-
-for i in range(1,5):
-    round_with_cipher(i,keys2,c)
