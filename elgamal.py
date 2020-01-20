@@ -96,12 +96,12 @@ class PublicKey(object):
 		self.h = h
                 self.iNumBits = iNumBits
 
-class ProxyKey(object):                                                                                                                                                                     
-        def __init__(self, p=None, g=None, piab=None, iNumBits=0):                                                                                                                               
-                self.p = p                                                                                                                                                                    
-                self.g = g                                                                                                                                                                    
+class ProxyKey(object):
+        def __init__(self, p=None, g=None, piab=None, iNumBits=0):
+                self.p = p
+                self.g = g
                 self.piab = piab
-                self.iNumBits = iNumBits                                                                                                                                                      
+                self.iNumBits = iNumBits
 
 
 def egcd(a, b):
@@ -323,16 +323,16 @@ def decode(aiPlaintext, iNumBits):
 		return decodedText
 
 #generates public key K1 (p, g, h) and private key K2 (p, g, x)
-def generate_keys(iNumBits=256, iConfidence=32,p =None):
+def generate_keys(iNumBits=256, iConfidence=32,p =None,g=None):
 		#p is the prime
 		#g is the primitve root
 		#x is random in (0, p-1) inclusive
 		#h = g ^ x mod p
-                if(p==None):
-		    p = find_prime(iNumBits, iConfidence)
+		if(p==None):
+			p = find_prime(iNumBits, iConfidence)
+			g = find_primitive_root(p)
+			g = modexp( g, 2, p )
 
-		g = find_primitive_root(p)
-		g = modexp( g, 2, p )
 		while True:
  			x = random.randint(1, (p - 1))
  			if gcd(x, p-1)==1:
