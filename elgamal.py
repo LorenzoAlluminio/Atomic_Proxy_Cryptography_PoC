@@ -330,8 +330,10 @@ def generate_keys(iNumBits=256, iConfidence=32,p =None,g=None):
 		#h = g ^ x mod p
 		if(p==None):
 			p = find_prime(iNumBits, iConfidence)
+		if (g == None):
 			g = find_primitive_root(p)
 			g = modexp( g, 2, p )
+
 
 		while True:
  			x = random.randint(1, (p - 1))
