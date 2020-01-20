@@ -2,6 +2,7 @@ from pwn import *
 from elgamal import *
 import sys
 
+
 a=int(sys.argv[1])
 p=int(sys.argv[2])
 qq=p-1

@@ -19,6 +19,8 @@ def sign(m,keys,proxyKey=None):
     k = []
     s1 = []
     for i in range(0,l):
+        # k is take between 1 and p-1 beacuse is applied to g;
+        #which is a generator of group of mod p-1
         k.append(randint(1,p-1))
         s1.append(modexp(g,k[i],p))
         h.update(str(s1[i]))
@@ -32,6 +34,8 @@ def sign(m,keys,proxyKey=None):
     print "extracted bits --> " + str(bits)
 
     s2 = []
+    if(proxyKey != None):
+        print "using proxy key: " + str(proxyKey) + " to rencode message " + str(m)
     for i in range(0,l):
         #TODO potential timing attack
         inva = inverse(a, p-1)
@@ -76,12 +80,15 @@ def verify(m,signature,pk):
     return True
 
 keysAlice=generate_keys(32,32)
+keysBob=generate_keys(32,32,keysAlice['publicKey'].p,keysAlice['publicKey'].g)
 m = 1001
 signature = sign(m,keysAlice)
-print verify(m,signature,keysAlice['publicKey'])
+print "Verify with Alice publickKey: " + str(verify(m,signature,keysAlice['publicKey']))
+print "Verify with Bob publickKey: " + str(verify(m,signature,keysBob['publicKey']))
 
-keysBob=generate_keys(32,32,keysAlice['publicKey'].p,keysAlice['publicKey'].g)
 proxyKey = generate_proxy_key(keysAlice['privateKey'].x,keysBob['privateKey'].x,keysAlice['publicKey'].p)
 m = 1001
 signature = sign(m,keysAlice,proxyKey)
-print verify(m,signature,keysBob['publicKey'])
+print "appying verify on: " + str(m)
+print "Verify with Alice publickKey: " + str(verify(m,signature,keysAlice['publicKey']))
+print "Verify with Bob publickKey: " + str(verify(m,signature,keysBob['publicKey']))
