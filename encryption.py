@@ -27,7 +27,7 @@ def encode(sPlaintext, iNumBits):
 		#i iterates through byte array
 		for i in range( len(byte_array) ):
                     #if i is divisible by k, start a new encoded integer
-                    
+
                     if i % k == 0:
                         j += k
                         num = 0
@@ -48,8 +48,8 @@ def encryption(publicKey, plainText):
     cipher_pairs = []
     for i in z:
 		#pick random y from (0, p-1) inclusive
-	while True:                                         
-            k = random.randint(1, (publicKey.p - 1))                                                              
+	while True:
+            k = random.randint(1, (publicKey.p - 1))
             if gcd(k, publicKey.p-1)==1:
                 break
         #c = g^y mod p
@@ -67,13 +67,13 @@ def decryption(privateKey, cipher_pairs ):
         c1 = i[0]
         c2 = i[1]
         s = modexp( c2, privateKey.x_inv, privateKey.p )
-    		
+
         plain = (c1*modinv( s,  privateKey.p)) % privateKey.p
         #add plain to list of plaintext integers
         plaintext.append( plain )
     decryptedText = decode(plaintext, privateKey.iNumBits)
     decryptedText = "".join([ch for ch in decryptedText if ch != '\x00'])
-    return decryptedText 
+    return decryptedText
 
 def decode(aiPlaintext, iNumBits):
 		#bytes array will hold the decoded original message bytes
@@ -120,7 +120,7 @@ def decode(aiPlaintext, iNumBits):
 
 		return decodedText
 def calculateProxyKey(keyA,keyB):
-    keyPiAB = ProxyKey(keyA.p,keyA.g,keyB.x * keyA.x_inv)  
+    keyPiAB = ProxyKey(keyA.p,keyA.g,keyB.x * keyA.x_inv)
     return keyPiAB
 def encryptionProxy(cipher_pairs,keyPiAB):
     newcipher_pairs = []
@@ -129,19 +129,16 @@ def encryptionProxy(cipher_pairs,keyPiAB):
         c2 = i[1]
         c2 = modexp( c2, keyPiAB.piab, keyPiAB.p )
         newcipher_pairs.append( [c1, c2] )
-    		
-        #add plain to list of plaintext integers
-    return newcipher_pairs 
 
-keysAlice = generate_keys(32) 
-keysBob  = generate_keys(32,p=keysAlice['publicKey'].p) 
+        #add plain to list of plaintext integers
+    return newcipher_pairs
+
+keysAlice = generate_keys(32)
+# Here is not necessary to have the same g, it works either way
+keysBob  = generate_keys(32,p=keysAlice['publicKey'].p,g=keysAlice['publicKey'].g)
 enc = encryption(keysAlice['publicKey'],"ciaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadasdasdsadasdas")
 keysPiAB = calculateProxyKey(keysAlice['privateKey'],keysBob['privateKey'])
 print keysPiAB.piab
 enc = encryptionProxy(enc,keysPiAB)
 print enc
 print decryption(keysBob['privateKey'],enc)
-
-
-
-

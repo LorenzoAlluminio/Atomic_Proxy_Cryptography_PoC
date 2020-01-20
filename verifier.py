@@ -13,7 +13,7 @@ print port
 nRound = int(sys.argv[5])
 
 if(len(sys.argv) > 6):
-    gb = int(sys.argv[7])     
+    gb = int(sys.argv[7])
     proxyKey = int(sys.argv[6])
 l = listen(int(port))
 for i in range(1,nRound):
@@ -27,11 +27,12 @@ for i in range(1,nRound):
     s2 = int(s2str)
     if(len(sys.argv) > 6):
         if(b == 1):
-           s2 = (s2*proxyKey)%p
-           res = modexp(gb, s2, p)            
+           s2 = (s2*proxyKey)%(p-1)
+           print "new s2 --> " + str(s2)
+           res = modexp(gb, s2, p)
         else:
-           res = modexp(g, s2, p)                
-    else:   
+           res = modexp(g, s2, p)
+    else:
         if(b == 1):
             res = modexp(ga, s2, p)
         else:
@@ -42,8 +43,7 @@ for i in range(1,nRound):
     if res == s1:
         if(len(sys.argv) > 6):
             print "Bob identificated"
-        else:        
+        else:
             print "Alice identificated"
     else:
         print "ERROR"
-
