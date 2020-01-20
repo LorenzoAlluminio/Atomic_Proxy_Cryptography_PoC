@@ -134,7 +134,7 @@ def encryptionProxy(cipher_pairs,keyPiAB):
     return newcipher_pairs
 
 keysAlice = generate_keys(32)
-#TODO ma sta g la teniamo o no???? funziona con tutti e due
+# Here is not necessary to have the same g, it works either way
 keysBob  = generate_keys(32,p=keysAlice['publicKey'].p,g=keysAlice['publicKey'].g)
 enc = encryption(keysAlice['publicKey'],"ciaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadasdasdsadasdas")
 keysPiAB = calculateProxyKey(keysAlice['privateKey'],keysBob['privateKey'])
