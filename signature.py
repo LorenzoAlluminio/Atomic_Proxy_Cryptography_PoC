@@ -7,7 +7,11 @@ from struct import *
 #TODO increase l
 l = 10
 
-def sign(m,keys):
+def generate_proxy_key(a,b,p):
+    invb = inverse(b, p-1)
+    return (a*invb)%(p-1)
+
+def sign(m,keys,proxyKey=None):
     a = keys['privateKey'].x
     p=keys['publicKey'].p
     g=keys['publicKey'].g
@@ -32,9 +36,15 @@ def sign(m,keys):
         #TODO potential timing attack
         inva = inverse(a, p-1)
         if bits[i] == 1:
-            s2.append((k[i]-m)*inva)
+            temp = (k[i]-m)*inva
+            if(proxyKey != None):
+                temp = (temp * proxyKey)
+            s2.append(temp)
         else:
-            s2.append(k[i]*inva)
+            temp = k[i]*inva
+            if(proxyKey != None):
+                temp = (temp * proxyKey)
+            s2.append(temp)
 
     print "s2 --> " + str(s2)
     return [s1,s2]
@@ -65,8 +75,13 @@ def verify(m,signature,pk):
 
     return True
 
-keys=generate_keys(32,32)
+keysAlice=generate_keys(32,32)
 m = 1001
-signature = sign(m,keys)
-#signature[0][1] = 100
-print verify(m,signature,keys['publicKey'])
+signature = sign(m,keysAlice)
+print verify(m,signature,keysAlice['publicKey'])
+
+keysBob=generate_keys(32,32,keysAlice['publicKey'].p,keysAlice['publicKey'].g)
+proxyKey = generate_proxy_key(keysAlice['privateKey'].x,keysBob['privateKey'].x,keysAlice['publicKey'].p)
+m = 1001
+signature = sign(m,keysAlice,proxyKey)
+print verify(m,signature,keysBob['publicKey'])
