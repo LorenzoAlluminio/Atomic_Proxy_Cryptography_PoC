@@ -1,9 +1,7 @@
-
-
 import random
 import math
 import sys
-
+from termcolor import *
 from elgamal import *
 
 
@@ -119,9 +117,11 @@ def decode(aiPlaintext, iNumBits):
 		decodedText = bytearray(b for b in bytes_array).decode('utf-8')
 
 		return decodedText
-def calculateProxyKey(keyA,keyB):
+
+def computeProxyKey(keyA,keyB):
     keyPiAB = ProxyKey(keyA.p,keyA.g,keyB.x * keyA.x_inv)
     return keyPiAB
+
 def encryptionProxy(cipher_pairs,keyPiAB):
     newcipher_pairs = []
     for i in cipher_pairs:
@@ -133,12 +133,20 @@ def encryptionProxy(cipher_pairs,keyPiAB):
         #add plain to list of plaintext integers
     return newcipher_pairs
 
+m = sys.argv[1]
+
 keysAlice = generate_keys(32)
 # Here is not necessary to have the same g, it works either way
 keysBob  = generate_keys(32,p=keysAlice['publicKey'].p,g=keysAlice['publicKey'].g)
-enc = encryption(keysAlice['publicKey'],"ciaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadasdasdsadasdas")
-keysPiAB = calculateProxyKey(keysAlice['privateKey'],keysBob['privateKey'])
-print keysPiAB.piab
+print colored("-------------------------- Encryption of plain text: ","green") + '\n'
+print colored("plaintext message --> ","cyan") + m + '\n'
+enc = encryption(keysAlice['publicKey'],m)
+print colored("encrypted message --> ","cyan") + str(enc) + '\n'
+print colored("-------------------------- Generate proxy key: ","green") + '\n'
+keysPiAB = computeProxyKey(keysAlice['privateKey'],keysBob['privateKey'])
+print colored("generated proxy keys --> ","cyan") + keysPiAB + '\n'
+print colored("-------------------------- Applying proxy key to cipher text: ","green") + '\n'
 enc = encryptionProxy(enc,keysPiAB)
-print enc
+print colored("encrypted message --> ","cyan") + str(enc) + '\n'
+print colored("-------------------------- Decryption with bob keys: ","green") + '\n'
 print decryption(keysBob['privateKey'],enc)
