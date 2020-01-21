@@ -10,7 +10,7 @@ import sys
 
 useProxy = int(sys.argv[1])
 
-nRound = 10
+nRound = 5
 port = 12345
 def generate_proxy_key(a,b,p):
     invb = inverse(b, p-1)
@@ -21,16 +21,16 @@ if(useProxy):
     proxyKey = generate_proxy_key(keysAlice['privateKey'].x,keysBob['privateKey'].x,keysAlice['publicKey'].p)
 
 def t1():
-    if(useProxy): 
-    
-        os.system( "python verifier.py " +  str(keysAlice['publicKey'].h) + " " + str(keysAlice['publicKey'].p) +" " +str(keysAlice['privateKey'].g) + " " + str(port) +" "+ str(nRound) + " "+ str(proxyKey) + " " + str(keysBob['publicKey'].h))
+    if(useProxy):
+
+        os.system( "python verifier.py " +  str(keysAlice['publicKey'].h) + " " + str(keysAlice['publicKey'].p) +" " +str(keysAlice['privateKey'].g) + " " + str(port) +" "+ str(nRound) + " " + str(keysBob['publicKey'].h))
     else:
-        os.system("python verifier.py " +  str(keysAlice['publicKey'].h) + " " + str(keysAlice['publicKey'].p) +" " +str(keysAlice['privateKey'].g) + " " + str(port) +" "+ str(nRound) + " " )
+        os.system("python verifier.py " +  str(keysAlice['publicKey'].h) + " " + str(keysAlice['publicKey'].p) +" " +str(keysAlice['privateKey'].g) + " " + str(port) +" "+ str(nRound) + " " + str(keysBob['publicKey'].h))
 
 def t2():
     if(useProxy):
 
-        os.system( "python prover.py " +  str(keysAlice['privateKey'].x) + " " +str(keysAlice['privateKey'].p) + " "+str(keysAlice['privateKey'].g)+ " "+ str(port) +" "+ str(nRound))
+        os.system( "python prover.py " +  str(keysAlice['privateKey'].x) + " " +str(keysAlice['privateKey'].p) + " "+str(keysAlice['privateKey'].g)+ " "+ str(port) +" "+ str(nRound)+ " "+ str(proxyKey) + " " + str(keysBob['publicKey'].h))
     else:
         os.system( "python prover.py " +  str(keysAlice['privateKey'].x) + " " +str(keysAlice['privateKey'].p) + " "+str(keysAlice['privateKey'].g)+ " "+ str(port) +" "+ str(nRound))
 
