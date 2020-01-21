@@ -3,6 +3,7 @@ from elgamal import *
 from math import *
 from hashlib import *
 from struct import *
+from termcolor import *
 
 #TODO increase l
 l = 10
@@ -10,7 +11,7 @@ l = 10
 def generate_proxy_key(a,b,p):
     invb = inverse(b, p-1)
     return (a*invb)%(p-1)
-
+'''
 def sign(m,keys,proxyKey=None):
     a = keys['privateKey'].x
     p=keys['publicKey'].p
@@ -52,6 +53,46 @@ def sign(m,keys,proxyKey=None):
 
     print "s2 --> " + str(s2)
     return [s1,s2]
+'''
+def sign(m,keys,proxyKey=None):
+    a = keys['privateKey'].x
+    p=keys['publicKey'].p
+    g=keys['publicKey'].g
+    h = sha256()
+    k = []
+    s1 = []
+    for i in range(0,l):
+        # k is take between 1 and p-1 beacuse is applied to g;
+        #which is a generator of group of mod p-1
+        k.append(randint(1,p-1))
+        s1.append(modexp(g,k[i],p))
+        h.update(str(s1[i]))
+    hash = h.digest()
+    print colored("s1 --> ", "red") + str(s1)
+    print colored("generated hash --> ", "red") + hash
+    bits = []
+    for i in range(0,l):
+        bits.append(unpack("<B",hash[i])[0]%2)
+
+    print colored("extracted bits --> ", "red") + str(bits)
+
+    s2 = []
+    for i in range(0,l):
+        #TODO potential timing attack
+        inva = inverse(a, p-1)
+        if bits[i] == 1:
+            s2.append((k[i]-m)*inva)
+        else:
+            s2.append(k[i]*inva)
+
+    if proxyKey != None:
+        print colored("using proxy key " + str(proxyKey) + " to rencode s2\n","red") + str(s2)
+        for i in range(0,l):
+                s2[i] = s2[i]*proxyKey;
+        print colored("Transformed message:\n","red") + str(s2)
+    else:
+        print colored("s2 --> ", "red") + str(s2)
+    return [s1,s2]
 
 def verify(m,signature,pk):
     s1 = signature[0]
@@ -65,12 +106,12 @@ def verify(m,signature,pk):
         h.update(str(s1[i]))
     hash = h.digest()
 
-    print "generated hash --> " + hash
+    print colored("generated hash --> ", "red") + hash
     bits = []
     for i in range(0,l):
         bits.append(unpack("<B",hash[i])[0]%2)
 
-    print "extracted bits --> " + str(bits)
+    print colored("extracted bits --> ", "red") + str(bits)
 
     for i in range(0,l):
         inv = inverse(modexp(g, m*bits[i], p), p)
@@ -80,15 +121,17 @@ def verify(m,signature,pk):
     return True
 
 keysAlice=generate_keys(32,32)
+# we need to pass Alice's p and g because they have to be shared in orther to create a valid proxy key
 keysBob=generate_keys(32,32,keysAlice['publicKey'].p,keysAlice['publicKey'].g)
 m = 1001
+print colored("Encripting the message " + str(m) +" with Alice private key", "green")
 signature = sign(m,keysAlice)
-print "Verify with Alice publickKey: " + str(verify(m,signature,keysAlice['publicKey']))
-print "Verify with Bob publickKey: " + str(verify(m,signature,keysBob['publicKey']))
+print colored("Verify with Alice publickKey: ","green") + str(verify(m,signature,keysAlice['publicKey']))
+print colored("Verify with Bob publickKey: ","green")+ str(verify(m,signature,keysBob['publicKey']))
 
 proxyKey = generate_proxy_key(keysAlice['privateKey'].x,keysBob['privateKey'].x,keysAlice['publicKey'].p)
 m = 1001
+print "Encripting the message " + str(m) + " with Alice private key and then applying the proxy key"
 signature = sign(m,keysAlice,proxyKey)
-print "appying verify on: " + str(m)
-print "Verify with Alice publickKey: " + str(verify(m,signature,keysAlice['publicKey']))
-print "Verify with Bob publickKey: " + str(verify(m,signature,keysBob['publicKey']))
+print colored("Verify with Alice publickKey: ","green") + str(verify(m,signature,keysAlice['publicKey']))
+print colored("Verify with Bob publickKey: ","green")+ str(verify(m,signature,keysBob['publicKey']))
