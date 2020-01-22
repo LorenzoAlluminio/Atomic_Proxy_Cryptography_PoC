@@ -138,15 +138,15 @@ m = sys.argv[1]
 keysAlice = generate_keys(32)
 # Here is not necessary to have the same g, it works either way
 keysBob  = generate_keys(32,p=keysAlice['publicKey'].p,g=keysAlice['publicKey'].g)
-print colored("-------------------------- Encryption of plain text: ","green") + '\n'
+print colored("-------------------------- Encryption of plain text with Alice keys: ","green") + '\n'
 print colored("plaintext message --> ","cyan") + m + '\n'
 enc = encryption(keysAlice['publicKey'],m)
-print colored("encrypted message --> ","cyan") + str(enc) + '\n'
+print colored("message encrypted with Alice public key --> ","cyan") + str(enc) + '\n'
 print colored("-------------------------- Generate proxy key: ","green") + '\n'
 keysPiAB = computeProxyKey(keysAlice['privateKey'],keysBob['privateKey'])
-print colored("generated proxy keys --> ","cyan") + keysPiAB + '\n'
+print colored("generated proxy key --> ","cyan") + str(keysPiAB.piab) + '\n'
 print colored("-------------------------- Applying proxy key to cipher text: ","green") + '\n'
 enc = encryptionProxy(enc,keysPiAB)
-print colored("encrypted message --> ","cyan") + str(enc) + '\n'
-print colored("-------------------------- Decryption with bob keys: ","green") + '\n'
-print decryption(keysBob['privateKey'],enc)
+print colored("message transformated by the proxy key --> ","cyan") + str(enc) + '\n'
+print colored("-------------------------- Decryption of ciphertext with bob keys: ","green") + '\n'
+print colored("message decrypted with bob private key--> ","cyan") + decryption(keysBob['privateKey'],enc)
