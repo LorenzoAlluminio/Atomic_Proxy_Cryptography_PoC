@@ -15,17 +15,32 @@ gb = int(sys.argv[6])
 Alice = 0
 Bob = 0
 l = listen(int(port))
+
+# generate vector of b with at least a 1 and a 0
+while True:
+    b = []
+    atleastone = 0
+    atleastzero = 0
+    for i in range (1,nRound):
+        v = random.randint(0,1)
+        if(v==1):
+            atleastone = 1
+        if(v==0):
+            atleastzero = 1
+        b.append(v)
+    if atleastone == 1 and atleastzero == 1:
+        break
+
 for i in range(1,nRound):
     s1str = l.recvline()
     s1 = int(s1str)
-    b = random.randint( 0, 1 )
-    print (str(b) + colored(" <-- sending randomly choosen b","cyan")).rjust(width)
-    l.sendline(str(b))
+    print (str(b[i-1]) + colored(" <-- sending randomly choosen b","cyan")).rjust(width)
+    l.sendline(str(b[i-1]))
     s2str = l.recvline()
     s2 = int(s2str)
     resA=0
     resB=0
-    if(b == 1):
+    if(b[i-1] == 1):
       resB = modexp(gb, s2, p)
       resA = modexp(ga, s2, p)
     else:
