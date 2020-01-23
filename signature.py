@@ -99,9 +99,9 @@ proxyKey = generate_proxy_key(keysAlice['privateKey'].x,keysBob['privateKey'].x,
 #Signing with Alice key
 print colored("-------------------------- Signing the message ", "green") + colored(str(m),"yellow") + colored(" with Alice private key\n", "green")
 signature = sign(m,keysAlice)
-print colored("-------------------------- Verify with Alice publickKey: ","green") + '\n'
+print colored("-------------------------- Verify with Alice public Key: ","green") + '\n'
 print colored ("Result: ", "yellow") + str(verify(m,signature,keysAlice['publicKey'])) + '\n'
-print colored("-------------------------- Verify with Bob publickKey: ","green") + '\n'
+print colored("-------------------------- Verify with Bob public Key: ","green") + '\n'
 print colored("Result: ","yellow") + str(verify(m,signature,keysBob['publicKey'])) + '\n'
 
 raw_input("")
@@ -109,7 +109,7 @@ raw_input("")
 #Signing with alice key and then applying proxy key
 print colored("-------------------------- Signing the message ", "green" ) + colored(str(m),"yellow") + colored( " with Alice private key and then applying the proxy key\n", "green")
 signature = sign(m,keysAlice,proxyKey)
-print colored("-------------------------- Verify with Alice publickKey: ","green")+ '\n'
+print colored("-------------------------- Verify with Alice public Key: ","green")+ '\n'
 print colored ("Result: ", "yellow") + str(verify(m,signature,keysAlice['publicKey']))+ '\n'
-print colored("-------------------------- Verify with Bob publickKey: ","green") + '\n'
+print colored("-------------------------- Verify with Bob public Key: ","green") + '\n'
 print colored("Result: ","yellow") + str(verify(m,signature,keysBob['publicKey'])) +'\n'

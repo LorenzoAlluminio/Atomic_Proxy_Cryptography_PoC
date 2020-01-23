@@ -50,8 +50,8 @@ for i in range(1,nRound):
             exit()
 
 if Bob == 1 and Alice == 0:
-    print colored("Bob completely identificated", "yellow").rjust(width)
+    print '\033[1m' + colored("Bob completely identificated", "yellow").rjust(width)
 elif Bob == 0 and Alice == 1:
-    print colored("Alice completely identificated", "yellow").rjust(width)
+    print '\033[1m' + colored("Alice completely identificated", "yellow").rjust(width)
 else:
-    print colored("Both parties identificated", "yellow").rjust(width)
+    print '\033[1m' + colored("No one identificated, please use more rounds", "yellow").rjust(width)
