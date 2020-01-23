@@ -12,7 +12,7 @@ port=int(sys.argv[4])
 nRound=int(sys.argv[5])
 
 io = remote('localhost', port)
-time.sleep(2)
+time.sleep(1)
 print colored("Public Parameters " , "green").rjust(50) + '\n'
 print colored("Generator g ","cyan") + str(g)
 print colored("Modulus p ","cyan") + str(p)
@@ -47,4 +47,4 @@ for i in range(1,nRound):
             s2 = (s2*proxyKey)%(p-1)
     print colored("sending s2 --> ", "cyan") + str(s2)
     io.sendline(str(s2))
-    time.sleep(2)
+    time.sleep(1)
