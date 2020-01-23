@@ -22,6 +22,9 @@ def t2():
 
 useProxy = int(sys.argv[1])
 nRound = int(sys.argv[2])
+if(nRound ==  1):
+    print("Insert more than 1 round please.")
+    exit()
 nRound += 1
 
 port = 12345
