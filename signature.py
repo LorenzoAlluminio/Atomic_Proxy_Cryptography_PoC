@@ -16,14 +16,14 @@ def generate_proxy_key(a,b,p):
 
 def sign(m,keys,proxyKey=None):
     a = keys['privateKey'].x
-    p=keys['publicKey'].p
-    g=keys['publicKey'].g
+    p = keys['publicKey'].p
+    g = keys['publicKey'].g
     h = sha256()
     k = []
     s1 = []
     for i in range(0,l):
         # k is take between 1 and p-1 beacuse is applied to g;
-        #which is a generator of group of mod p-1
+        #which is a generator of group of mod p
         k.append(randint(1,p-1))
         s1.append(modexp(g,k[i],p))
         h.update(str(s1[i]))
@@ -38,6 +38,7 @@ def sign(m,keys,proxyKey=None):
 
     print colored("extracted bits --> ", "cyan") + str(bits) + '\n'
 
+    #Creating vector s2
     s2 = []
     for i in range(0,l):
         #TODO potential timing attack
@@ -68,12 +69,9 @@ def verify(m,signature,pk):
         h.update(str(s1[i]))
     hash = h.digest()
 
-    #print colored("generated hash --> ", "cyan") + hash.encode("base64")
     bits = []
     for i in range(0,l):
         bits.append(unpack("<B",hash[i])[0]%2)
-
-    #print colored("extracted bits --> ", "cyan") + str(bits) + '\n'
 
     res = []
     flag = 0
