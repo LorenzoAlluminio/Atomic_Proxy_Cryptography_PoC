@@ -1,6 +1,13 @@
 # bigsec_project
 Bigsec project on Atomic Proxy Cryptography
 
+## Team members
+- Lorenzo Alluminio
+- Giulia Clerici
+- Fulvio Di Girolamo
+- Raffaele Stelluti
+- Edoardo Giordano
+
 **THIS IS ONLY FOR DEMO PURPOSES!**
 
 ## ENCRYPTION
