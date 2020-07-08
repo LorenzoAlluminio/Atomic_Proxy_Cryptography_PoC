@@ -1,5 +1,6 @@
-# bigsec_project
-Bigsec project on Atomic Proxy Cryptography
+# Atomic Proxy Cryptography PoC
+
+Big Data Security project on Atomic Proxy Cryptography.
 
 ## Team members
 - Lorenzo Alluminio
