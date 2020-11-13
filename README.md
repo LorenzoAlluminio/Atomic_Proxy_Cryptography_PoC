@@ -20,7 +20,7 @@ python encryption.py <message>
 ## SIGNATURE
 
 ```
-python encryption.py <messageInteger>
+python signature.py <messageInteger>
 ```
 
 
